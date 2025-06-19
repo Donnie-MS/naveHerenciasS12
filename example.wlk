@@ -39,19 +39,25 @@ class NavesPasajeros inherits NaveEspacial {
     cantDeBebida += cantidad
   }
 }
+class NaveDeCombate inherits NaveEspacial {
+  var property estaInvisible = false
+  method ponerseVisible() {estaInvisible = false}
+  method ponerseInvisible() {estaInvisible = true}
+
+  var property misilesDesplegados = false
+  method desplegarMisiles() {misilesDesplegados = true}
+  method replegarMisiles() {misilesDesplegados = false}
+
+  const mensajesEmitidos = []
+  method emitirMensaje(mensaje) {mensajesEmitidos.add(mensaje)}
+  method mensajesEmitidos() = mensajesEmitidos
+  method primerMensajeEmitido() = mensajesEmitidos.first()
+  method ultimoMensajeEmitido() = mensajesEmitidos.last()
+  method esEscueta() = mensajesEmitidos.all({mensaje => mensaje.length() <= 30 })
+  method emitioMensaje(mensaje) = mensajesEmitidos.contains(mensaje)
+}
 
 /*
-Naves de combate
-Entienden estos mensajes:
-ponerseVisible(), ponerseInvisible(), estaInvisible(): puede estar visiblo o invisible.
-desplegarMisiles(), replegarMisiles(), misilesDesplegados(): los misiles pueden, o no, estar desplegados.
-emitirMensaje(mensaje), mensajesEmitidos(), primerMensajeEmitido(), ultimoMensajeEmitido(),
- esEscueta(), emitioMensaje(mensaje).
-
-
-Las naves de combate tienen la capacidad de emitir mensajes,
- cada mensaje se representa como un String, p.ej. "Llegando a Saturno". 
- Una nave de combate es escueta si no emitió ningún mensaje de más de 30 caracteres.
 Todas las naves tienen que ser capaces de entender el mensaje prepararViaje().
  Lo que hace cada nave cuando le indican que debe preparar un viaje depende de qué tipo de nave sea:
 
