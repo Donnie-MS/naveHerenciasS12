@@ -1,6 +1,6 @@
 class NaveEspacial {
   var property direccionRespectoAlSol
-  method velocidad()//kms/seg
+  var property velocidad
   method acelerar(cuanto)
   method desacelerar(cuanto)
   method irHaciaElSol() {direccionRespectoAlSol = 10}
@@ -12,7 +12,7 @@ class NaveEspacial {
   method alejarseUnPocoDelSol() {
     direccionRespectoAlSol = -10.max(direccionRespectoAlSol - 1)
   }
-
+  method prepararViaje()
 }
 object verde{}
 object rojo{}
@@ -26,7 +26,10 @@ class NaveBaliza inherits NaveEspacial {
     }
     colorBaliza = colorNuevo
   }
-
+  override method prepararViaje() {
+    self.cambiarColorDeBaliza(verde)
+    self.PonerseParaleloAlSol()
+  }
 }
 class NavesPasajeros inherits NaveEspacial {
   var property cantPasajeros 
@@ -37,6 +40,10 @@ class NavesPasajeros inherits NaveEspacial {
   }
   method cargarBebida(cantidad) {
     cantDeBebida += cantidad
+  }
+  override method prepararViaje() {
+    self.cargarComida(4 * cantPasajeros)
+    self.cargarBebida(6 * cantPasajeros)
   }
 }
 class NaveDeCombate inherits NaveEspacial {
@@ -55,16 +62,11 @@ class NaveDeCombate inherits NaveEspacial {
   method ultimoMensajeEmitido() = mensajesEmitidos.last()
   method esEscueta() = mensajesEmitidos.all({mensaje => mensaje.length() <= 30 })
   method emitioMensaje(mensaje) = mensajesEmitidos.contains(mensaje)
+
+  override method prepararViaje() {
+    self.ponerseVisible()
+    self.replegarMisiles()
+    self.velocidad(15000)
+    self.emitirMensaje("Saliendo en misión")
+  }
 }
-
-/*
-Todas las naves tienen que ser capaces de entender el mensaje prepararViaje().
- Lo que hace cada nave cuando le indican que debe preparar un viaje depende de qué tipo de nave sea:
-
-las naves-baliza cambian el color de la baliza a verde, y se ponen paralelas al Sol.
-las naves de pasajeros cargan 4 raciones de comida, 
-y 6 de bebida, para cada pasajero que llevan. Además, 
-se acercan un poco al Sol.
-las naves de combate se ponen visibles, repliegan sus misiles,
- aceleran 15000 kms/seg, y emiten el mensaje "Saliendo en misión".
-*/
