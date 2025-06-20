@@ -1,8 +1,22 @@
+
 class NaveEspacial {
   var property direccionRespectoAlSol
-  var property velocidad
-  method acelerar(cuanto)
-  method desacelerar(cuanto)
+  var velocidad
+
+  var combustible 
+  method combustible() = combustible
+  method cargarCombustible(cantidad) {combustible += cantidad}
+  method descargarCombustible(cantidad) {combustible -= cantidad}
+
+  method escapar()
+  method avisar()
+  method recibirAmenaza() {
+    self.escapar()
+    self.avisar()
+  }
+
+  method acelerar(cuanto) {velocidad += cuanto}
+  method desacelerar(cuanto) {velocidad -= cuanto}
   method irHaciaElSol() {direccionRespectoAlSol = 10}
   method escaparDelSol() {direccionRespectoAlSol = -10}
   method PonerseParaleloAlSol() {direccionRespectoAlSol = 0}
@@ -12,14 +26,15 @@ class NaveEspacial {
   method alejarseUnPocoDelSol() {
     direccionRespectoAlSol = -10.max(direccionRespectoAlSol - 1)
   }
-  method prepararViaje()
+  method prepararViaje() {
+    self.cargarCombustible(30000)
+    self.acelerar(5000)
+  }
+  method estaTranquila() = combustible >= 4000 and velocidad <= 12000
 }
-object verde{}
-object rojo{}
-object azul{}
 class NaveBaliza inherits NaveEspacial {
   var colorBaliza
-  const coloresValidos = #{verde, rojo, azul}
+  const coloresValidos = #{"verde", "rojo", "azul"}
   method cambiarColorDeBaliza(colorNuevo) {
     if(!coloresValidos.contains(colorNuevo)) {
       self.error("el color nuevo no es válido")
@@ -27,11 +42,19 @@ class NaveBaliza inherits NaveEspacial {
     colorBaliza = colorNuevo
   }
   override method prepararViaje() {
-    self.cambiarColorDeBaliza(verde)
+    super()
+    self.cambiarColorDeBaliza("verde")
     self.PonerseParaleloAlSol()
   }
+  override method estaTranquila() = super() and coloresValidos != "rojo"
+  override method escapar() {
+    self.irHaciaElSol()
+  }
+  override method avisar() {
+    self.cambiarColorDeBaliza("rojo")
+  }
 }
-class NavesPasajeros inherits NaveEspacial {
+class NavePasajeros inherits NaveEspacial {
   var property cantPasajeros 
   var cantDeComida
   var cantDeBebida
@@ -41,9 +64,20 @@ class NavesPasajeros inherits NaveEspacial {
   method cargarBebida(cantidad) {
     cantDeBebida += cantidad
   }
+  method darRacionesYDosBebidas() {
+    cantDeComida =- cantPasajeros
+    cantDeBebida =- cantPasajeros*2
+  }
   override method prepararViaje() {
+    super()
     self.cargarComida(4 * cantPasajeros)
     self.cargarBebida(6 * cantPasajeros)
+  }
+  override method escapar() {
+    self.acelerar(velocidad)
+  }
+  override method avisar() {
+    self.darRacionesYDosBebidas()
   }
 }
 class NaveDeCombate inherits NaveEspacial {
@@ -66,7 +100,25 @@ class NaveDeCombate inherits NaveEspacial {
   override method prepararViaje() {
     self.ponerseVisible()
     self.replegarMisiles()
-    self.velocidad(15000)
+    super()
+    self.acelerar(15000)
     self.emitirMensaje("Saliendo en misión")
   }
+  override method estaTranquila() = super() and !self.misilesDesplegados()
+  override method escapar() {
+    self.acercarseUnPocoAlSol()
+    self.acercarseUnPocoAlSol()
+  }
+  override method avisar() {
+    self.emitioMensaje("Amenaza recibida")
+  }
+}
+class NaveHospital inherits NavePasajeros{
+  var property tienePreparadoQuirofanos = false
+  method prepararQuirofanos() {tienePreparadoQuirofanos = true}
+  method usarQuirofano() {tienePreparadoQuirofanos = false}
+  override method estaTranquila() = super() and self.tienePreparadoQuirofanos()
+}
+class NaveSigilosa inherits NaveDeCombate{
+  override method estaTranquila() = super() and !self.estaInvisible() 
 }
